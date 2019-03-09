@@ -1,0 +1,70 @@
+ # 当前页
+    current_page = int(request.GET.get('page', 1))
+    try:
+        if current_page.isdigit():
+            current_page = int(current_page)
+        else:
+            current_page = 1
+    except Exception as e:
+        if current_page <= 0:
+            current_page = 1
+    # 一页显示多少行数据
+    per_page = 10
+    # 数据一共多少行
+    total_rows = len(users)
+    # 起始位置
+    start_pos = (current_page - 1) * 10
+    # 0 10
+    # 10 20
+    # 结束位置
+    end_pos = current_page * 10
+    pages, more = divmod(total_rows, per_page)
+    if more:
+        pages += 1
+        # 全部的页码
+    total_page = 11
+    # 一半的页码
+    half_page = total_page // 2
+
+    # 页码的开始和结束
+    if current_page <= half_page:  # 当前页面小于等于一半的页码
+        start = 1
+        end = total_page
+    elif current_page >= pages - half_page:  # 当前页面大于等于总页面减去一半的页码
+        start = pages - total_page
+        end = pages
+    else:
+        # 开始页
+        start = current_page - half_page
+        # 结束页
+        end = current_page + half_page
+
+    page_list = []
+    # 首页的实现
+    first_page = '<li><a href="/customer_list/?page=1" >首页</a></li>'
+    page_list.append(first_page)
+    # 上一页实现
+    if current_page == 1:
+        pre_page = '<li class="disabled"><a href="" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>'
+    else:
+        pre_page = '<li><a href="/customer_list/?page={}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>'.format(
+            current_page - 1)
+    page_list.append(pre_page)
+    # 循环生成li标签
+    for num in range(start, end + 1):
+        if num == current_page:
+            li_html = '<li class="active"><a href="/customer_list/?page={0}">{0}</a></li>'.format(num)
+        else:
+            li_html = '<li><a href="/customer_list/?page={0}">{0}</a></li>'.format(num)
+        page_list.append(li_html)
+        # 下一页
+    if current_page == pages:
+        nex_page = '<li class="disabled"><a href="" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>'
+    else:
+        nex_page = '<li><a href="/customer_list/?page={}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>'.format(
+            current_page + 1)
+    page_list.append(nex_page)
+    # 尾页的实现
+    end_page = '<li><a href="/customer_list/?page=31" >尾页</a></li>'
+    page_list.append(end_page)
+    pages = ''.join(page_list)
